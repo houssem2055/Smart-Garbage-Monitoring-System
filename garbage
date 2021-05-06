@@ -1,0 +1,61 @@
+#define BLYNK_PRINT Serial
+
+#include <BlynkSimpleCurieBLE.h>
+#include <CurieBLE.h>
+#include <Ultrasonic.h>
+
+// You should get Auth Token in the Blynk App.
+// Go to the Project Settings (nut icon).
+char auth[] = "8b7229b2c3ec4b999eca6781903a208d";
+
+BLEPeripheral  blePeripheral;
+WidgetLED green(V1);
+WidgetLED orange(V2);
+WidgetLED red(V3);
+
+
+Ultrasonic ultrasonic(7);
+int distance = 0;
+int thresh [3] = {20,12,4};
+
+
+void setup() {
+  Serial.begin(9600);
+  delay(1000);
+
+  blePeripheral.setLocalName("garbage");
+  blePeripheral.setDeviceName("garbage");
+  blePeripheral.setAppearance(384);
+  Blynk.begin(blePeripheral, auth);
+  blePeripheral.begin();
+  Serial.println("Waiting for connections...");
+}
+
+void loop() {
+distance = ultrasonic.distanceRead();
+Serial.print(distance);
+Blynk.run();
+  if(distance<=thresh[0]&&distance>=thresh[1]&&distance>=thresh[2]){
+    green.on();
+    Serial.println(1);
+    }
+  else if(distance<=thresh[0]&&distance<=thresh[1]&&distance>=thresh[2]){
+    green.on();
+    orange.on();
+    Serial.println(2);
+  }
+  else if(distance<=thresh[0]&&distance<=thresh[1]&&distance<=thresh[2]){
+    green.on();
+    orange.on();
+    red.on();
+    Serial.println(3);
+  }
+  else{
+    green.off();
+    orange.off();
+    red.off();
+    Serial.println(0);
+  }
+  delay(100);
+
+}
